@@ -1,6 +1,6 @@
 # SimplePartage - Application de partage de fichiers avec Symfony
 
-SimplePartage est une application de partage de fichiers développée avec Symfony, permettant aux utilisateurs de gérer des dossiers et des fichiers avec un système de permissions avancé.
+SimplePartage est une application de partage de fichiers développée avec Symfony en Vibe coding, permettant aux utilisateurs de gérer des dossiers et des fichiers avec un système de permissions avancé.
 
 ![alt text](<public/uploads/docs/Capture d’écran 2025-09-28 à 00.40.12.png>)
 ![alt text](<public/uploads/docs/Capture d’écran 2025-09-28 à 00.40.46.png>)
