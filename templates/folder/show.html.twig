@@ -1,0 +1,208 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SimplePartage - {{ folder.name }}{% endblock %}
+
+{% block body %}
+    <div class="d-flex align-items-center mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb p-0 m-0">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_folder_index') }}" class="text-decoration-none">
+                        <i class="fas fa-home text-primary me-1"></i> Accueil
+                    </a>
+                </li>
+                
+                {# Construction du fil d'Ariane en remontant les dossiers parents #}
+                {% set breadcrumbs = [] %}
+                {% set current_folder = folder.parent %}
+                {% for i in 1..10 %} {# Limite de 10 niveaux pour éviter les boucles infinies #}
+                    {% if current_folder %}
+                        {% set breadcrumbs = [current_folder] | merge(breadcrumbs) %}
+                        {% set current_folder = current_folder.parent %}
+                    {% endif %}
+                {% endfor %}
+
+                {# Affichage du fil d'Ariane #}
+                {% for item in breadcrumbs %}
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('app_folder_show', {'id': item.id}) }}" class="text-decoration-none">
+                            {{ item.name }}
+                        </a>
+                    </li>
+                {% endfor %}
+
+                <li class="breadcrumb-item active fw-semibold" aria-current="page">{{ folder.name }}</li>
+            </ol>
+        </nav>
+        
+        <div class="ms-auto">
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-plus me-1"></i> Nouveau
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{{ path('app_folder_new', {'parent': folder.id}) }}">
+                                <i class="fas fa-folder-plus me-2 text-primary"></i> Sous-dossier
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ path('app_file_upload', {'id': folder.id}) }}">
+                                <i class="fas fa-file-upload me-2 text-primary"></i> Téléverser un fichier
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center mb-4">
+        <h1 class="fw-bold mb-0">
+            <i class="fas fa-folder-open text-primary me-2"></i>
+            {{ folder.name }}
+        </h1>
+        <div class="ms-auto">
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_folder_permission_index', {'id': folder.id}) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fas fa-cog me-1"></i> Gérer les permissions
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="{% if subfolders|length > 0 %}col-lg-4 col-md-5{% else %}d-none{% endif %}">
+            {% if subfolders|length > 0 %}
+                <div class="card mb-4 h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-folder text-primary me-2"></i>
+                            Sous-dossiers
+                        </h5>
+                        <span class="badge bg-light text-primary">{{ subfolders|length }}</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for subfolder in subfolders %}
+                                <div class="list-group-item list-group-item-action border-0 py-3 px-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <a href="{{ path('app_folder_show', {'id': subfolder.id}) }}" class="text-decoration-none text-dark d-flex align-items-center">
+                                            <div class="folder-icon me-3">
+                                                <i class="fas fa-folder text-primary fa-lg"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-semibold">{{ subfolder.name }}</h6>
+                                                <small class="text-muted">Créé le: {{ subfolder.createdAt|date('d/m/Y') }}</small>
+                                            </div>
+                                        </a>
+                                        <div>
+                                            <span class="badge bg-primary rounded-pill me-2">{{ subfolder.files|length }} fichier(s)</span>
+                                            {% if is_granted('ROLE_ADMIN') %}
+                                                <form method="post" action="{{ path('app_folder_delete', {'id': subfolder.id}) }}" style="display: inline-block"
+                                                      data-controller="confirm"
+                                                      data-action="submit->confirm#onSubmit"
+                                                      data-confirm-message-value="Êtes-vous sûr de vouloir supprimer ce dossier et tout son contenu?">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subfolder.id) }}">
+                                                    <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                        <i class="bi bi-trash"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="{% if subfolders|length > 0 %}col-lg-8 col-md-7{% else %}col-12{% endif %}">
+            {% if canViewFiles %}
+                <div class="card mb-4 h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            Fichiers
+                        </h5>
+                        <div>
+                            <span class="badge bg-light text-primary me-2">{{ files|length }} fichier(s)</span>
+                            <a href="{{ path('app_file_upload', {'id': folder.id}) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-upload me-1"></i> Téléverser
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if files|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="border-0">Nom</th>
+                                            <th class="border-0">Taille</th>
+                                            <th class="border-0">Date</th>
+                                            <th class="border-0 text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for file in files %}
+                                            <tr>
+                                                <td class="align-middle">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="file-icon me-3">
+                                                            <i class="fas fa-file text-primary"></i>
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="mb-0 fw-semibold">{{ file.filename }}</h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="align-middle">{{ file.formattedSize }}</td>
+                                                <td class="align-middle">{{ file.uploadedAt|date('d/m/Y H:i') }}</td>
+                                                <td class="align-middle text-end">
+                                                    <div class="btn-group">
+                                                        {% if canDownloadFiles %}
+                                                            <a href="{{ path('app_file_download', {'id': file.id}) }}" class="btn btn-sm btn-outline-primary" title="Télécharger">
+                                                                <i class="fas fa-download"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if is_granted('ROLE_ADMIN') %}
+                                                            <form method="post" action="{{ path('app_file_delete', {'id': file.id}) }}" style="display: inline-block"
+                                                                  data-controller="confirm"
+                                                                  data-action="submit->confirm#onSubmit"
+                                                                  data-confirm-message-value="Êtes-vous sûr de vouloir supprimer ce fichier?">
+                                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ file.id) }}">
+                                                                <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                                    <i class="bi bi-trash"></i> Supprimer
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-file-alt text-muted fa-3x mb-3"></i>
+                                <p class="text-muted">Aucun fichier dans ce dossier.</p>
+                                <a href="{{ path('app_file_upload', {'id': folder.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-upload me-1"></i> Téléverser un fichier
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Vous n'avez pas les droits pour voir les fichiers de ce dossier.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,3 +1,118 @@
+/*
+ * Design "fun" pour le thème 'Brite' de Bootswatch.
+ * Effets : Glassmorphism, survol 3D et animations.
+ */
+
+:root {
+    --brite-primary: #5cb85c; /* Vert du thème Brite */
+    --border-radius-fun: 12px;
+}
+
 body {
-    background-color: skyblue;
+    background-image: url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Inter', sans-serif;
+    padding-top: 80px;
+}
+
+/* Barre de navigation effet "verre dépoli" */
+.navbar.fixed-top {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Icônes animées */
+.navbar .nav-link i, .dropdown-item i {
+    transition: transform 0.3s ease-in-out;
+}
+.navbar .nav-link:hover i, .dropdown-item:hover i {
+    transform: scale(1.2) rotate(-10deg);
+}
+
+/* Cartes effet "verre dépoli" avec survol 3D */
+.card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-fun);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.card:hover {
+    transform: perspective(1000px) rotateY(5deg) translateY(-10px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.2), 
+                0 0 20px -5px var(--brite-primary);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* On garde les styles par défaut des boutons Brite, avec une petite animation */
+.btn {
+    transition: transform 0.2s ease;
+}
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* Conteneur principal */
+.content-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Barre de défilement personnalisée pour correspondre au thème Brite */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--brite-primary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4a9b4a; /* Un vert un peu plus foncé */
+}
+
+/* Style du fil d'Ariane (effet "verre dépoli") */
+.breadcrumb {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-fun);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb-item a {
+    font-weight: 500;
+    color: var(--brite-primary); /* On utilise le vert du thème */
+}
+
+.breadcrumb-item a:hover {
+    color: #4a9b4a; /* Un vert un peu plus foncé au survol */
+}
+
+.breadcrumb-item.active {
+    font-weight: 500;
+    color: #6c757d; /* Un gris neutre pour l'élément actif */
 }

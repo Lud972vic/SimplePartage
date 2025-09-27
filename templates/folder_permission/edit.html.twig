@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la permission{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h1>Modifier la permission pour le groupe : {{ permission.group.name }}</h1>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {# <button class="btn btn-primary mt-3">{{ button_label|default('Modifier') }}</button> #}
+            {{ form_end(form) }}
+
+            <a href="{{ path('app_folder_permission_index', {'id': permission.folder.id}) }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+        </div>
+    </div>
+{% endblock %}

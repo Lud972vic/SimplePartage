@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SimplePartage - Téléverser un fichier{% endblock %}
+
+{% block body %}
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ path('app_folder_index') }}">Accueil</a></li>
+            {% set parentFolder = folder.parent %}
+            {% set breadcrumbs = [] %}
+            {% set maxIterations = 100 %}
+            {% set currentIteration = 0 %}
+            {% set keepLooping = true %}
+            {% for i in 1..maxIterations %}
+                {% if parentFolder and keepLooping %}
+                    {% set breadcrumbs = breadcrumbs|merge([parentFolder]) %}
+                    {% set parentFolder = parentFolder.parent %}
+                    {% set currentIteration = currentIteration + 1 %}
+                {% else %}
+                    {% set keepLooping = false %}
+                {% endif %}
+            {% endfor %}
+            {% for ancestor in breadcrumbs|reverse %}
+                <li class="breadcrumb-item"><a href="{{ path('app_folder_show', {'id': ancestor.id}) }}">{{ ancestor.name }}</a></li>
+            {% endfor %}
+            <li class="breadcrumb-item"><a href="{{ path('app_folder_show', {'id': folder.id}) }}">{{ folder.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Téléverser un fichier</li>
+        </ol>
+    </nav>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h1>Téléverser un fichier dans "{{ folder.name }}"</h1>
+        </div>
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                <div class="mb-3">
+                    {{ form_label(form.file) }}
+                    {{ form_widget(form.file, {'attr': {'class': 'form-control'}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.file) }}
+                    </div>
+                    <small class="form-text text-muted">Taille maximale: 100 MB</small>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ path('app_folder_show', {'id': folder.id}) }}" class="btn btn-secondary">Annuler</a>
+                    <button type="submit" class="btn btn-primary">Téléverser</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

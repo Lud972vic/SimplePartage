@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    upload_directory: '%kernel.project_dir%/public/uploads'
 
 services:
     # default configuration for services in *this* file
@@ -15,6 +16,29 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\EventListener\FolderListener:
+        arguments:
+            - '@Symfony\Component\String\Slugger\SluggerInterface'
+            - '%kernel.project_dir%'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: preRemove }
+
+    App\Command\CreateTestFilesCommand:
+        arguments:
+            $uploadDir: '%upload_directory%'
+
+    App\Controller\FileController:
+        arguments:
+            - '@App\Service\PermissionCheckerService'
+            - '@doctrine.orm.entity_manager'
+            - '@App\Repository\FileRepository'
+            - '@Symfony\Component\String\Slugger\SluggerInterface'
+            - '%kernel.project_dir%'

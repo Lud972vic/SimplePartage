@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur - Fichier non trouvé{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Erreur {{ error_code }}
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-file-alt text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h3 class="text-center mb-4">{{ error_message }}</h3>
+                    
+                    <div class="alert alert-secondary">
+                        {% if file_path is defined %}
+                            <p><strong>Chemin du fichier :</strong> {{ file_path }}</p>
+                        {% endif %}
+                        
+                        {% if file_id is defined %}
+                            <p><strong>ID du fichier :</strong> {{ file_id }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-muted">
+                        Le fichier que vous essayez d'accéder n'est pas disponible. Cela peut être dû à plusieurs raisons :
+                    </p>
+                    
+                    <ul class="text-muted">
+                        <li>Le fichier a été supprimé</li>
+                        <li>Le fichier a été déplacé</li>
+                        <li>L'URL que vous avez utilisée est incorrecte</li>
+                        <li>Vous n'avez pas les permissions nécessaires pour accéder à ce fichier</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_folder_index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-1"></i> Retour à l'accueil
+                        </a>
+                        <a href="#" onclick="window.history.back(); return false;" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à la page précédente
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

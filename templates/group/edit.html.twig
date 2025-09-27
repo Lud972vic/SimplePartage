@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le groupe{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h1 class="h2">Modifier le groupe</h1>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+
+            <button type="submit" class="btn btn-primary mt-3">Mettre à jour</button>
+            <a href="{{ path('app_group_index') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Permissions du dossier{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <!-- Fil d'Ariane -->
+        <nav aria-label="breadcrumb" class="mt-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_folder_index') }}"><i class="bi bi-house-door"></i> Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('app_folder_show', {'id': folder.id}) }}"><i class="bi bi-folder"></i> {{ folder.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><i class="bi bi-shield-lock"></i> Permissions</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 mb-0"><i class="bi bi-shield-lock me-2"></i>Permissions : {{ folder.name }}</h1>
+            <div>
+                <a href="{{ path('app_folder_show', {'id': folder.id}) }}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i> Retour
+                </a>
+                <a href="{{ path('app_folder_permission_new', {'id': folder.id}) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Ajouter une permission
+                </a>
+            </div>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>{{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-list-ul me-2"></i>Liste des permissions</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">Groupe</th>
+                                <th class="text-center">Voir dossier</th>
+                                <th class="text-center">Voir fichiers</th>
+                                <th class="text-center">Télécharger fichiers</th>
+                                <th class="text-end pe-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for permission in permissions %}
+                            <tr>
+                                <td class="ps-3">
+                                    <span class="fw-medium">{{ permission.group.name }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if permission.canViewFolder %}
+                                        <span class="badge bg-success"><i class="bi bi-check-lg"></i></span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-lg"></i></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if permission.canViewFiles %}
+                                        <span class="badge bg-success"><i class="bi bi-check-lg"></i></span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-lg"></i></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if permission.canDownloadFiles %}
+                                        <span class="badge bg-success"><i class="bi bi-check-lg"></i></span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="bi bi-x-lg"></i></span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end pe-3">
+                                    <div class="btn-group">
+                                        <a href="{{ path('app_folder_permission_edit', {'id': permission.id}) }}" class="btn btn-sm btn-outline-warning" title="Modifier">
+                                            <i class="bi bi-pencil">Modifier</i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_folder_permission_delete', {'id': permission.id}) }}" style="display: inline-block"
+                                              data-controller="confirm"
+                                              data-action="submit->confirm#onSubmit"
+                                              data-confirm-message-value="Êtes-vous sûr de vouloir supprimer cette permission?">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ permission.id) }}">
+                                            <button class="btn btn-sm btn-outline-danger" title="Supprimer">
+                                                <i class="bi bi-trash"></i> Supprimer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <i class="bi bi-exclamation-circle text-muted me-2"></i>Aucune permission trouvée
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
